@@ -8,15 +8,15 @@ export class SubmitRideCompletionStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const managementFunction = new lambda.Function(this, 'rides-management-function', {
+    const managementFunction = new lambda.Function(this, 'Rides-Processor', {
       runtime: lambda.Runtime.NODEJS_18_X,
-      handler: 'rides-management-function.handler',
+      handler: 'rides-processor.handler',
       code: lambda.Code.fromAsset('functions')
     });
 
-    const ridesIntegration = new HttpLambdaIntegration('rides-management-integration', managementFunction);
+    const ridesIntegration = new HttpLambdaIntegration('Rides-Management-Integration', managementFunction);
 
-    const httpApi = new apigwv2.HttpApi(this, 'rides-management-http-api');
+    const httpApi = new apigwv2.HttpApi(this, 'Rides-Management-Http-Api');
     httpApi.addRoutes({
       path: '/submit/rides/create',
       methods: [ apigwv2.HttpMethod.POST ],
