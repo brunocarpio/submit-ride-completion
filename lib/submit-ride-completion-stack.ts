@@ -1,17 +1,20 @@
 import { HttpApi, HttpMethod } from "@aws-cdk/aws-apigatewayv2-alpha";
 import { HttpLambdaIntegration } from "@aws-cdk/aws-apigatewayv2-integrations-alpha";
 import { Stack, StackProps } from "aws-cdk-lib";
-import { Code, Function, Runtime } from "aws-cdk-lib/aws-lambda";
+import { Runtime } from "aws-cdk-lib/aws-lambda";
+import { NodejsFunction } from "aws-cdk-lib/aws-lambda-nodejs";
 import { Construct } from "constructs";
 
 export class SubmitRideCompletionStack extends Stack {
   constructor(scope: Construct, id: string, props?: StackProps) {
     super(scope, id, props);
 
-    const managementFunction = new Function(this, "Rides-Processor", {
+    const managementFunction = new NodejsFunction(this, "Rides-Processor", {
       runtime: Runtime.NODEJS_18_X,
-      handler: "rides-processor.handler",
-      code: Code.fromAsset("functions"),
+      entry: "./functions/rides-processor.ts",
+      bundling: {
+        minify: true,
+      },
     });
 
     const ridesIntegration = new HttpLambdaIntegration(
