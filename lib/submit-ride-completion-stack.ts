@@ -14,6 +14,7 @@ export class SubmitRideCompletionStack extends Stack {
       entry: "./functions/rides-processor.ts",
       bundling: {
         minify: true,
+        sourceMap: true,
       },
     });
 
