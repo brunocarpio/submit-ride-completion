@@ -36,7 +36,7 @@ export class SubmitRideCompletionStack extends Stack {
 
     const integration = new AwsIntegration({
       service: "sns",
-      action: "publish",
+      action: "Publish",
       options: {
         credentialsRole: role,
         requestTemplates: {
