@@ -48,6 +48,12 @@ export class SubmitRideCompletionStack extends Stack {
       },
     });
 
-    resource.addMethod("POST", integration);
+    resource.addMethod("POST", integration, {
+      methodResponses: [
+        {
+          statusCode: "200",
+        },
+      ],
+    });
   }
 }
