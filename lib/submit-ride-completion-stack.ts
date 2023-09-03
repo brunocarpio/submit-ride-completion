@@ -1,5 +1,9 @@
 import { Stack, StackProps } from "aws-cdk-lib";
-import { AwsIntegration, RestApi } from "aws-cdk-lib/aws-apigateway";
+import {
+  AwsIntegration,
+  PassthroughBehavior,
+  RestApi,
+} from "aws-cdk-lib/aws-apigateway";
 import { PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { Topic } from "aws-cdk-lib/aws-sns";
 import { SqsSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
@@ -39,10 +43,16 @@ export class SubmitRideCompletionStack extends Stack {
       action: "Publish",
       options: {
         credentialsRole: role,
+        passthroughBehavior: PassthroughBehavior.NEVER,
+        requestParameters: {
+          "integration.request.header.Content-Type":
+            "'application/x-www-form-urlencoded'",
+        },
         requestTemplates: {
           "application/json": JSON.stringify({
-            TopicArn: topic.topicArn,
-            Message: "$util.escapeJavaScript($input.body)",
+            Action: "Publish",
+            TopicArn: "$util.urlEncode(topic.topicArn)",
+            Message: "$util.urlEncode($input.body)",
           }),
         },
       },
