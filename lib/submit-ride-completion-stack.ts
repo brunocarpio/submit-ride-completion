@@ -21,5 +21,7 @@ export class SubmitRideCompletionStack extends Stack {
       .addResource("submit")
       .addResource("ride")
       .addResource("create");
+
+    resource.addMethod("POST");
   }
 }
