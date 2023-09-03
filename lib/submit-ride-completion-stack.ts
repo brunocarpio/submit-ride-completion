@@ -41,6 +41,7 @@ export class SubmitRideCompletionStack extends Stack {
     const integration = new AwsIntegration({
       service: "sns",
       action: "Publish",
+      integrationHttpMethod: "POST",
       options: {
         credentialsRole: role,
         passthroughBehavior: PassthroughBehavior.NEVER,
@@ -49,12 +50,18 @@ export class SubmitRideCompletionStack extends Stack {
             "'application/x-www-form-urlencoded'",
         },
         requestTemplates: {
-          "application/json": JSON.stringify({
-            Action: "Publish",
-            TopicArn: "$util.urlEncode(topic.topicArn)",
-            Message: "$util.urlEncode($input.body)",
-          }),
+          "application/json": `Action=Publish&TopicArn=$util.urlEncode('${topic.topicArn}')&Message=$util.urlEncode($input.body)`,
         },
+        integrationResponses: [
+          {
+            statusCode: "200",
+            responseTemplates: {
+              "application/json": JSON.stringify({
+                body: "Message received successfully",
+              }),
+            },
+          },
+        ],
       },
     });
 
