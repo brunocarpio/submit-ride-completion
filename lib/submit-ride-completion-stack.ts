@@ -16,5 +16,10 @@ export class SubmitRideCompletionStack extends Stack {
     topic.addSubscription(new SqsSubscription(queue));
 
     const api = new RestApi(this, "Rides-Management-Rest-Api");
+
+    const resource = api.root
+      .addResource("submit")
+      .addResource("ride")
+      .addResource("create");
   }
 }
