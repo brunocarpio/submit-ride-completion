@@ -1,5 +1,6 @@
 import { Stack, StackProps } from "aws-cdk-lib";
-import { RestApi } from "aws-cdk-lib/aws-apigateway";
+import { AwsIntegration, RestApi } from "aws-cdk-lib/aws-apigateway";
+import { PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { Topic } from "aws-cdk-lib/aws-sns";
 import { SqsSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
 import { Queue } from "aws-cdk-lib/aws-sqs";
@@ -22,6 +23,31 @@ export class SubmitRideCompletionStack extends Stack {
       .addResource("ride")
       .addResource("create");
 
-    resource.addMethod("POST");
+    const role = new Role(this, "Rides-Management-Api-Integration-Role", {
+      assumedBy: new ServicePrincipal("apigateway.amazonaws.com"),
+    });
+
+    role.addToPolicy(
+      new PolicyStatement({
+        actions: ["sns:Publish"],
+        resources: [topic.topicArn],
+      })
+    );
+
+    const integration = new AwsIntegration({
+      service: "sns",
+      action: "publish",
+      options: {
+        credentialsRole: role,
+        requestTemplates: {
+          "application/json": JSON.stringify({
+            TopicArn: topic.topicArn,
+            Message: "$util.escapeJavaScript($input.body)",
+          }),
+        },
+      },
+    });
+
+    resource.addMethod("POST", integration);
   }
 }
